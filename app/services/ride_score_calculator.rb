@@ -18,7 +18,7 @@ class RideScoreCalculator
     # Calculate score
     score = earnings / total_duration.to_f
     score
-  rescue => e
+  rescue StandardError => e
     puts "Error calculating score #{e.message}"
   end
 end
