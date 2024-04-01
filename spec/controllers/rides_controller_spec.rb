@@ -1,0 +1,56 @@
+require 'rails_helper'
+
+RSpec.describe RidesController, type: :controller do
+  describe 'GET #index' do
+    context 'when driver exists' do
+      let(:driver) { create(:driver) }
+      let!(:ride1) { create(:ride, driver: driver) }
+      let!(:ride2) { create(:ride, driver: driver) }
+
+      before do
+        allow(Driver).to receive(:find).with(driver.id.to_s).and_return(driver)
+        allow_any_instance_of(RideScoreCalculator).to receive(:calculate).and_return(10, 8)
+        get :index, params: { driver_id: driver.id }
+      end
+
+      it 'returns a successful response' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns rides sorted by score in descending order' do
+        rides_data = JSON.parse(response.body)['rides_data']
+        expect(rides_data.length).to eq(2)
+        expect(rides_data[0]['ride_id']).to eq(ride1.id)
+        expect(rides_data[1]['ride_id']).to eq(ride2.id)
+        expect(rides_data[0]['ride_score']).to be > rides_data[1]['ride_score']
+      end
+    end
+
+    context 'when driver does not exist' do
+      before { get :index, params: { driver_id: -1 } }
+
+      it 'returns a not found response' do
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'returns an error message' do
+        expect(JSON.parse(response.body)['error']).to eq('Driver not found')
+      end
+    end
+
+    context 'when an error occurs' do
+      before do
+        allow_any_instance_of(RideScoreCalculator).to receive(:calculate).and_raise(StandardError, 'Calculation error')
+        get :index, params: { driver_id: create(:driver).id }
+      end
+
+      it 'returns an unprocessable entity response' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'returns an error message' do
+        expect(JSON.parse(response.body)['error']).to eq('Calculation error')
+      end
+    end
+  end
+end
