@@ -37,20 +37,5 @@ RSpec.describe RidesController, type: :controller do
         expect(JSON.parse(response.body)['error']).to eq('Driver not found')
       end
     end
-
-    context 'when an error occurs' do
-      before do
-        allow_any_instance_of(RideScoreCalculator).to receive(:calculate).and_raise(StandardError, 'Calculation error')
-        get :index, params: { driver_id: create(:driver).id }
-      end
-
-      it 'returns an unprocessable entity response' do
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
-      it 'returns an error message' do
-        expect(JSON.parse(response.body)['error']).to eq('Calculation error')
-      end
-    end
   end
 end

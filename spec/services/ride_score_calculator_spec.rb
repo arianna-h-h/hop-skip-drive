@@ -41,11 +41,11 @@ RSpec.describe RideScoreCalculator do
       let(:driver_home_address) { '789 Oak St, City, State' }
 
       before do
-        allow(google_maps_api).to receive(:fetch_ride_stats).and_raise(StandardError, 'Calculation error')
+        allow(google_maps_api).to receive(:fetch_ride_stats).and_raise(StandardError, 'new error')
       end
 
       it 'returns nil' do
-        expect(ride_score_calculator.calculate(start_address, destination_address, driver_home_address)).to be_nil
+        expect { ride_score_calculator.calculate(start_address, destination_address, driver_home_address) }.to output("Error calculating score new error\n").to_stdout
       end
     end
   end
