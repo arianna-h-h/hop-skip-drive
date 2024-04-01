@@ -1,11 +1,7 @@
 # Create drivers
-driver1 = Driver.create(home_address: '123 Main St')
-driver2 = Driver.create(home_address: '456 Elm St')
-driver3 = Driver.create(home_address: '789 Oak St')
+driver1 = Driver.create(home_address: '2901 Bertland Ave, Durham, NC 27705')
 
 # Create rides
-Ride.create(start_address: '789 Oak St', destination_address: '101 Pine St', driver: driver1)
-Ride.create(start_address: '111 Maple St', destination_address: '222 Birch St', driver: driver2)
-Ride.create(start_address: '333 Walnut St', destination_address: '444 Cedar St', driver: driver1)
-Ride.create(start_address: '555 Elm St', destination_address: '666 Oak St', driver: driver2)
-Ride.create(start_address: '777 Pine St', destination_address: '888 Maple St', driver: driver1)
+Ride.create(start_address: '2930 W Main St, Durham, NC 27705', destination_address: '810 9th St, Durham, NC 27705', driver: driver1)
+Ride.create(start_address: '621 Broad St, Durham, NC 27705', destination_address: '8210 Renaissance Pkwy, Durham, NC 27713as', driver: driver1)
+Ride.create(start_address: '1829 Front St Suite D, Durham, NC 27705', destination_address: '4037 Chapel Hill Blvd, Durham, NC 27707', driver: driver1)
