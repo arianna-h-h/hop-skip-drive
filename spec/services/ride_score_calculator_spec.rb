@@ -1,15 +1,8 @@
-# spec/services/ride_score_calculator_spec.rb
-
 require 'rails_helper'
 
 RSpec.describe RideScoreCalculator do
   describe '#calculate' do
-    let(:google_maps_api) { instance_double(GoogleMapsApi) }
     let(:ride_score_calculator) { described_class.new }
-
-    before do
-      allow(GoogleMapsApi).to receive(:new).and_return(google_maps_api)
-    end
 
     context 'when valid addresses are provided' do
       let(:start_address) { '123 Main St, City, State' }
@@ -19,8 +12,8 @@ RSpec.describe RideScoreCalculator do
       let(:commute_stats) { OpenStruct.new(distance: 20, duration: 2200 ) }
 
       before do
-        allow(google_maps_api).to receive(:fetch_ride_stats).with(start_address, destination_address).and_return(ride_stats)
-        allow(google_maps_api).to receive(:fetch_ride_stats).with(driver_home_address, start_address).and_return(commute_stats)
+        allow_any_instance_of(GoogleMapsApi).to receive(:fetch_ride_stats).with(start_address, destination_address).and_return(ride_stats)
+        allow_any_instance_of(GoogleMapsApi).to receive(:fetch_ride_stats).with(driver_home_address, start_address).and_return(commute_stats)
       end
 
       it 'calculates the ride score correctly' do
@@ -41,7 +34,7 @@ RSpec.describe RideScoreCalculator do
       let(:driver_home_address) { '789 Oak St, City, State' }
 
       before do
-        allow(google_maps_api).to receive(:fetch_ride_stats).and_raise(StandardError, 'new error')
+        allow_any_instance_of(GoogleMapsApi).to receive(:fetch_ride_stats).and_raise(StandardError, 'new error')
       end
 
       it 'returns nil' do
