@@ -9,7 +9,7 @@ RSpec.describe RidesController, type: :controller do
       let!(:ride_scores) {[ 
         { ride_id: 2, ride_score: 5 }, 
         { ride_id: 1, ride_score: 4 }
-        ]}
+      ]}
 
       before do
         allow(Driver).to receive(:find).with(driver.id.to_s).and_return(driver)

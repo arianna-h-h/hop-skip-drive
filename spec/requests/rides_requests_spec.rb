@@ -5,22 +5,25 @@ RSpec.describe RidesController, type: :request do
     let!(:driver) { create(:driver) }
     let!(:ride1) { create(:ride, driver: driver) }
     let!(:ride2) { create(:ride, start_address: "799 Oak St", driver: driver) }
+    let!(:ride_scores) {[
+        { ride_id: 2, ride_score: 10 },
+        { ride_id: 1, ride_score: 4 }
+    ]}
 
     context 'when the driver exists' do
       it 'returns a JSON response with ride data' do
-        allow_any_instance_of(RideScoreCalculator).to receive(:calculate).with(ride1.start_address, ride1.destination_address, driver.home_address).and_return(75)
-        allow_any_instance_of(RideScoreCalculator).to receive(:calculate).with(ride2.start_address, ride2.destination_address, driver.home_address).and_return(100)
+        allow_any_instance_of(RideScoreCalculator).to receive(:calculate_ordered_scores).and_return(ride_scores)
         get "/rides", params: { driver_id: driver.id }
 
         expect(response).to have_http_status(:success)
 
-        rides_data = JSON.parse(response.body)['rides_data']
-        expect(rides_data.size).to eq(2)
+        ride_scores = JSON.parse(response.body)['ride_scores']
+        expect(ride_scores.size).to eq(2)
 
-        ride_data = rides_data.first
+        ride_score = ride_scores.first
         # Ride 2 has the greater score
-        expect(ride_data['ride_id']).to eq(ride2.id)
-        expect(ride_data).to have_key('ride_score')
+        expect(ride_score['ride_id']).to eq(ride2.id)
+        expect(ride_score).to have_key('ride_score')
       end
     end
 
@@ -36,7 +39,7 @@ RSpec.describe RidesController, type: :request do
 
     context 'when a downstream error occurs' do
       it 'returns a 422 error' do
-        allow_any_instance_of(RideScoreCalculator).to receive(:calculate).and_raise(StandardError, 'Calculation error')
+        allow_any_instance_of(RideScoreCalculator).to receive(:calculate_ordered_scores).and_raise(StandardError, 'Calculation error')
         get "/rides", params: { driver_id: driver.id }
 
         expect(response).to have_http_status(:unprocessable_entity)
