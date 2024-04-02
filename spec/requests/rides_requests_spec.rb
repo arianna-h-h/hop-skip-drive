@@ -2,10 +2,10 @@ require 'rails_helper'
 
 RSpec.describe RidesController, type: :request do
   describe 'GET /rides' do
-    let!(:driver) { create(:driver) }
+    let(:driver) { create(:driver) }
     let!(:ride1) { create(:ride, driver: driver) }
-    let!(:ride2) { create(:ride, start_address: "799 Oak St", driver: driver) }
-    let!(:ride_scores) {[
+    let(:ride2) { create(:ride, start_address: "799 Oak St", driver: driver) }
+    let(:ride_scores) {[
         { ride_id: 2, ride_score: 10 },
         { ride_id: 1, ride_score: 4 }
     ]}

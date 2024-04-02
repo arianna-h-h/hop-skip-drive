@@ -4,8 +4,8 @@ RSpec.describe RideScoreCalculator do
   describe '#calculate_ordered_scores' do
     let(:driver) { create(:driver) }
     let!(:ride1) { create(:ride, destination_address: "123 Main St, City, State", driver: driver) }
-    let!(:ride2) { create(:ride, driver: driver) }
-    let!(:ride_score_calculator) { described_class.new(driver) }
+    let(:ride2) { create(:ride, driver: driver) }
+    let(:ride_score_calculator) { described_class.new(driver) }
 
     context 'when valid addresses are provided' do
       let(:ride1_stats) { { "distance": 10, "duration": 1800 } }

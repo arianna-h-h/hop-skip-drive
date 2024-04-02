@@ -3,11 +3,11 @@ require 'rails_helper'
 RSpec.describe RidesController, type: :controller do
   describe 'GET #index' do
     context 'when driver exists' do
-      let!(:driver) { create(:driver) }
+      let(:driver) { create(:driver) }
       let!(:ride1) { create(:ride, driver: driver) }
-      let!(:ride2) { create(:ride, driver: driver) }
-      let!(:ride_scores) {[ 
-        { ride_id: 2, ride_score: 5 }, 
+      let(:ride2) { create(:ride, driver: driver) }
+      let(:ride_scores) {[
+        { ride_id: 2, ride_score: 5 },
         { ride_id: 1, ride_score: 4 }
       ]}
 
