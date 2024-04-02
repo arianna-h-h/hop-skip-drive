@@ -10,6 +10,9 @@ class RideScoreCalculator
       { ride_id: ride.id, ride_score: ride_score }
     end
     ordered_scores = sort_ride_scores(unordered_scores)
+    ordered_scores
+  rescue StandardError => e
+    puts "Error calculating score: #{e.message}"
   end
 
   private
@@ -32,8 +35,6 @@ class RideScoreCalculator
     # Calculate score
     score = earnings / total_duration.to_f
     score
-  rescue StandardError => e
-    puts "Error calculating score #{e.message}"
   end
 
   def sort_ride_scores(unordered_scores)
