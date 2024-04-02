@@ -18,11 +18,8 @@ class RideScoreCalculator
   private
 
   def calculate_ride_score(ride)
-    start_address = ride.start_address
-    destination_address = ride.destination_address
-    driver_home_address = @driver.home_address
-    ride_stats = @google_maps_api.fetch_ride_stats(start_address, destination_address)
-    commute_stats = @google_maps_api.fetch_ride_stats(driver_home_address, start_address)
+    ride_stats = @google_maps_api.fetch_ride_stats(ride.start_address, ride.destination_address)
+    commute_stats = @google_maps_api.fetch_ride_stats(@driver.home_address, ride.start_address)
     ride_duration = ride_stats[:duration]
     ride_distance = ride_stats[:distance]
     commute_duration = commute_stats[:duration]
