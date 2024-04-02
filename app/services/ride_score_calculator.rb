@@ -1,9 +1,23 @@
 class RideScoreCalculator
-  def initialize
+  def initialize(driver)
     @google_maps_api = GoogleMapsApi.new
+    @driver = driver
   end
 
-  def calculate(start_address, destination_address, driver_home_address)
+  def calculate_ordered_scores
+    unordered_scores = @driver.rides.map do |ride|
+      ride_score = calculate_ride_score(ride)
+      { ride_id: ride.id, ride_score: ride_score }
+    end
+    ordered_scores = sort_ride_scores(unordered_scores)
+  end
+
+  private
+
+  def calculate_ride_score(ride)
+    start_address = ride.start_address
+    destination_address = ride.destination_address
+    driver_home_address = @driver.home_address
     ride_stats = @google_maps_api.fetch_ride_stats(start_address, destination_address)
     commute_stats = @google_maps_api.fetch_ride_stats(driver_home_address, start_address)
     ride_duration = ride_stats[:duration]
@@ -20,5 +34,9 @@ class RideScoreCalculator
     score
   rescue StandardError => e
     puts "Error calculating score #{e.message}"
+  end
+
+  def sort_ride_scores(unordered_scores)
+    unordered_scores.sort_by { |ride_data| ride_data[:ride_score] }.reverse
   end
 end
