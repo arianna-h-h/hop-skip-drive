@@ -1,44 +1,40 @@
 require 'rails_helper'
 
 RSpec.describe RideScoreCalculator do
-  describe '#calculate' do
-    let(:ride_score_calculator) { described_class.new }
+  describe '#calculate_ordered_scores' do
+    let(:driver) { create(:driver) }
+    let!(:ride1) { create(:ride, destination_address: "123 Main St, City, State", driver: driver) }
+    let!(:ride2) { create(:ride, driver: driver) }
+    let!(:ride_score_calculator) { described_class.new(driver) }
 
     context 'when valid addresses are provided' do
-      let(:start_address) { '123 Main St, City, State' }
-      let(:destination_address) { '456 Elm St, City, State' }
-      let(:driver_home_address) { '789 Oak St, City, State' }
-      let(:ride_stats) { OpenStruct.new(distance: 10, duration: 1800) }
-      let(:commute_stats) { OpenStruct.new(distance: 20, duration: 2200 ) }
+      let(:ride1_stats) { { "distance": 10, "duration": 1800 } }
+      let(:ride2_stats) { { "distance": 20, "duration": 3000 } }
+      let(:commute1_stats) { { "distance": 10, "duration": 1000 } }
+      let(:commute2_stats) { { "distance": 24, "duration": 2400 } }
 
       before do
-        allow_any_instance_of(GoogleMapsApi).to receive(:fetch_ride_stats).with(start_address, destination_address).and_return(ride_stats)
-        allow_any_instance_of(GoogleMapsApi).to receive(:fetch_ride_stats).with(driver_home_address, start_address).and_return(commute_stats)
+        allow_any_instance_of(GoogleMapsApi).to receive(:fetch_ride_stats).with(ride1.start_address, ride1.destination_address).and_return(ride1_stats)
+        allow_any_instance_of(GoogleMapsApi).to receive(:fetch_ride_stats).with(driver.home_address, ride1.start_address).and_return(commute1_stats)
+        allow_any_instance_of(GoogleMapsApi).to receive(:fetch_ride_stats).with(ride2.start_address, ride2.destination_address).and_return(ride2_stats)
+        allow_any_instance_of(GoogleMapsApi).to receive(:fetch_ride_stats).with(driver.home_address, ride2.start_address).and_return(commute2_stats)
       end
 
-      it 'calculates the ride score correctly' do
-        # Manually calculate the expected score
-        earnings = 12
-        earnings += (ride_stats.distance - 5) * 1.50 if ride_stats.distance > 5
-        earnings += (ride_stats.duration - 15) * 0.70 if ride_stats.duration > 15
-        total_duration = commute_stats.duration.to_f + ride_stats.duration.to_f
-        expected_score = earnings / total_duration
-
-        expect(ride_score_calculator.calculate(start_address, destination_address, driver_home_address)).to eq(expected_score)
+      it 'calculates the ride scores correctly in descending order' do
+        ride_scores = ride_score_calculator.calculate_ordered_scores
+        expect(ride_scores[0][:ride_id]).to eq(ride2.id)
+        expect(ride_scores[1][:ride_id]).to eq(ride1.id)
       end
     end
 
     context 'when an error occurs during calculation' do
-      let(:start_address) { '123 Main St, City, State' }
-      let(:destination_address) { '456 Elm St, City, State' }
-      let(:driver_home_address) { '789 Oak St, City, State' }
 
       before do
         allow_any_instance_of(GoogleMapsApi).to receive(:fetch_ride_stats).and_raise(StandardError, 'new error')
       end
 
       it 'returns nil' do
-        expect { ride_score_calculator.calculate(start_address, destination_address, driver_home_address) }.to output("Error calculating score new error\n").to_stdout
+        expect { ride_score_calculator.calculate_ordered_scores }.to output("Error calculating score: new error\n").to_stdout
       end
     end
   end
