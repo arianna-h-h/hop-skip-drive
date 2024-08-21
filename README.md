@@ -26,7 +26,7 @@
 
 
 # Limitations
-Due to limited time and the nature of a coding asssessment for a job interview, I did not write this to the standard of a production app. There are several areas that I would implement differently if this was a production app: 
+Due to the sample app nature of this project, I did not write this to the standard of a production app. There are several areas that I would implement differently if this was a production app: 
 1. I would implement pagination or limit number of rides fetched at once since some drivers may have a large number of rides.  
 2. To reduce duplicate API calls, I could persist the score of a ride in case it is recurring.
 3. I would use feature branching instead of commiting on the main branch. 
